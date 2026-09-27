@@ -1,0 +1,312 @@
+// Prisma schema for LEGEND - Premium Men's Fashion
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String?
+  phone        String?
+  passwordHash String?
+  role         String      @default("customer")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  orders       Order[]
+  carts        Cart[]
+  addresses    Address[]
+  wishlists    Wishlist[]
+  reviews      Review[]
+}
+
+model AdminUser {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  role         String      @default("admin")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  image       String?
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  products    Product[]
+
+  @@index([isActive, order])
+}
+
+model Product {
+  id           String           @id @default(cuid())
+  name         String
+  slug         String           @unique
+  sku          String           @unique
+  description  String
+  details      String?          // Fabric, fit, care instructions
+  price        Float
+  comparePrice Float?
+  stock        Int              @default(15)
+  isPublished  Boolean          @default(true)
+  isFeatured   Boolean          @default(false)
+  isNewArrival Boolean          @default(false)
+  categoryId   String
+  category     Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  images       ProductImage[]
+  variants     ProductVariant[]
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+  wishlists    Wishlist[]
+  reviews      Review[]
+
+  @@index([categoryId])
+  @@index([isPublished])
+  @@index([isPublished, categoryId])
+  @@index([isPublished, createdAt])
+  @@index([isNewArrival])
+  @@index([isFeatured])
+  @@index([price])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size          String   // e.g. "S", "M", "L", "XL", "XXL", "32", "100ml"
+  color         String   // e.g. "Ivory", "Obsidian Black", "Italian Navy"
+  colorHex      String?  // e.g. "#FAF8F5", "#141414", "#1E2A38"
+  sku           String?
+  stock         Int      @default(10)
+  priceOverride Float?
+  createdAt     DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?    @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  cartId     String
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId  String?
+  size       String?
+  color      String?
+  quantity   Int      @default(1)
+  price      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  status          String      @default("Pending Payment")
+  // Status flow: "Pending Payment", "Payment Review", "Payment Confirmed", "Processing", "Ready to Ship", "Shipped", "Delivered", "Cancelled", "Payment Rejected"
+  subtotal        Float
+  shippingFee     Float       @default(0.0)
+  total           Float
+  shippingAddress String
+  apartment       String?
+  city            String
+  state           String?
+  postalCode      String?
+  country         String      @default("United States")
+  trackingNumber  String?
+  notes           String?
+  rejectionReason String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[]
+  payment         Payment?
+
+  @@index([status])
+  @@index([customerEmail])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productName  String
+  productImage String?
+  variantInfo  String?
+  size         String?
+  color        String?
+  quantity     Int      @default(1)
+  price        Float
+  subtotal     Float
+  createdAt    DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id              String           @id @default(cuid())
+  orderId         String           @unique
+  order           Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method          String           @default("BANK_TRANSFER")
+  amount          Float
+  status          String           @default("PENDING") // PENDING, UNDER_REVIEW, APPROVED, REJECTED
+  bankName        String?
+  accountName     String?
+  accountNumber   String?
+  referenceCode   String?
+  verifiedAt      DateTime?
+  verifiedBy      String?
+  rejectionReason String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  receipts        PaymentReceipt[]
+}
+
+model PaymentReceipt {
+  id          String   @id @default(cuid())
+  paymentId   String
+  payment     Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  fileUrl     String
+  fileName    String
+  fileType    String   // "image/jpeg", "image/png", "application/pdf"
+  fileSize    Int?
+  status      String   @default("SUBMITTED") // SUBMITTED, APPROVED, REJECTED
+  notes       String?
+  uploadedAt  DateTime @default(now())
+
+  @@index([paymentId])
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String
+  phone         String
+  streetAddress String
+  apartment     String?
+  city          String
+  state         String?
+  postalCode    String
+  country       String   @default("United States")
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String?
+  linkUrl   String?
+  position  String   @default("homepage_hero")
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   // text or JSON encoded
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  content     String
+  isPublished Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@unique([sessionId, productId])
+  @@index([productId])
+}
+
+model Review {
+  id                 String   @id @default(cuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  authorName         String
+  rating             Int      @default(5)
+  title              String?
+  comment            String
+  isVerifiedPurchase Boolean  @default(true)
+  isApproved         Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  @@index([productId])
+}

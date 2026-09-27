@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+:root {
+  --bg-warm: #FAF8F5;
+  --surface-white: #FFFFFF;
+  --surface-muted: #F4F1EA;
+  --text-main: #121212;
+  --text-muted: #66635F;
+  --text-subtle: #8E8B85;
+  --border-subtle: #E8E5E0;
+  --border-light: #F0EDE8;
+  --accent-gold: #9B783E;
+  --accent-gold-hover: #826330;
+  --accent-gold-light: #FAF4EB;
+  --badge-bg: #F0EDE8;
+  --danger: #9B2C2C;
+  --danger-light: #FFF5F5;
+  --success: #2A6B46;
+  --success-light: #F0FDF4;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-warm);
+  color: var(--text-main);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom hairline borders and transitions */
+.border-hairline {
+  border-color: var(--border-subtle);
+}
+
+.bg-warm {
+  background-color: var(--bg-warm);
+}
+
+.bg-surface {
+  background-color: var(--surface-white);
+}
+
+.bg-muted-warm {
+  background-color: var(--surface-muted);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted-warm {
+  color: var(--text-muted);
+}
+
+.text-accent {
+  color: var(--accent-gold);
+}
+
+.border-accent {
+  border-color: var(--accent-gold);
+}
+
+/* Subtle image zoom on hover with GPU compositing */
+.zoom-image {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .zoom-image {
+  transform: scale(1.04) translateZ(0);
+}
+
+/* Luxury Drawer & Side Panel Smooth Physics */
+.drawer-panel {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-backdrop {
+  will-change: opacity, backdrop-filter;
+  transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overscroll-contain {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fast, smooth, GPU-friendly transitions for interactive controls */
+button:not(:disabled),
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+select {
+  cursor: pointer;
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 200ms;
+}
+
+button:not(:disabled):active,
+[role="button"]:active {
+  transform: scale(0.98);
+}
+
+/* Hardware accelerated micro-lift utility */
+.hover-lift {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px) translateZ(0);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF8F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8D4CD;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B5B1AA;
+}
+
+/* Smooth luxury micro-animations for add-to-cart */
+@keyframes cart-bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.22) rotate(-3deg);
+  }
+
+  50% {
+    transform: scale(0.96) rotate(2deg);
+  }
+
+  75% {
+    transform: scale(1.08) rotate(-1deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-cart-bounce {
+  animation: cart-bounce 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes highlight-added-glow {
+  0% {
+    background-color: rgba(155, 120, 62, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(155, 120, 62, 0.4);
+  }
+
+  100% {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+}
+
+.animate-highlight-added {
+  animation: highlight-added-glow 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* GPU acceleration for smooth transitions */
+.will-change-transform {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Running Announcement Marquee Ticker */
+@keyframes marquee-running {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-running {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  animation: marquee-running var(--marquee-speed, 55s) linear infinite;
+}
+
+.group:hover .animate-marquee-running,
+.animate-marquee-running:hover,
+.animate-marquee-running:focus-within {
+  animation-play-state: paused;
+}
+
+/* Content visibility auto optimization for smooth scrolling & fast DOM calculation */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
+}
+
+/* Smooth momentum scrolling for mobile WebKit */
+@supports (-webkit-overflow-scrolling: touch) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee-running {
+    animation-duration: 120s;
+  }
+}
