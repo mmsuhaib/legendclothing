@@ -90,9 +90,9 @@ export async function GET(request: Request) {
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
   const origin =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
-    url.origin ||
-    "http://localhost:3000";
+    process.env.NODE_ENV === "development"
+      ? url.origin
+      : process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || url.origin || "http://localhost:3000";
   const redirectUri = `${origin}/api/auth/google/callback`;
 
   if (!clientId || !clientSecret) {

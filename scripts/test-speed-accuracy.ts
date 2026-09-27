@@ -92,9 +92,9 @@ async function runBenchmarksAndAccuracyTests() {
   }
 
   // 4. DATABASE INDEXES INTEGRITY
-  console.log("\n[4/4] Verifying Database Indexes in SQLite...");
+  console.log("\n[4/4] Verifying Database Indexes in PostgreSQL...");
   try {
-    const indexes: any[] = await prisma.$queryRaw`PRAGMA index_list("Product");`;
+    const indexes: any[] = await prisma.$queryRaw`SELECT indexname as name FROM pg_indexes WHERE tablename = 'Product';`;
     const indexNames = indexes.map((idx) => idx.name);
     console.log(`  - Product indexes found in DB: ${indexes.length}`);
     for (const name of indexNames) {

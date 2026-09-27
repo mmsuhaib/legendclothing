@@ -11,6 +11,7 @@ const nextConfig = {
 
   images: {
     unoptimized: true,
+    qualities: [75, 80, 85, 90, 100],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -22,15 +23,19 @@ const nextConfig = {
   },
   async headers() {
     return [
-      {
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
+      ...(process.env.NODE_ENV === "production"
+        ? [
+            {
+              source: "/_next/static/:path*",
+              headers: [
+                {
+                  key: "Cache-Control",
+                  value: "public, max-age=31536000, immutable",
+                },
+              ],
+            },
+          ]
+        : []),
       {
         source: "/(favicon.ico|icon.png|logo.png|manifest.webmanifest|manifest.json)",
         headers: [

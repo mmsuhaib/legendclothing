@@ -9,6 +9,7 @@ import { useCart } from "@/context/cart-context";
 
 export function CartDrawer() {
   const pathname = usePathname();
+
   const {
     cart,
     isOpen,
@@ -52,8 +53,9 @@ export function CartDrawer() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 overflow-hidden transition-all duration-500 ${isOpen ? "pointer-events-auto visible" : "pointer-events-none invisible delay-500"
-        }`}
+      className={`fixed inset-0 z-50 overflow-hidden ${
+        isOpen ? "pointer-events-auto visible" : "pointer-events-none invisible delay-500"
+      }`}
       aria-hidden={!isOpen}
     >
       {/* Backdrop with smooth blur and fade */}

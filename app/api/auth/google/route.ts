@@ -8,11 +8,12 @@ export async function GET(request: Request) {
     process.env.GOOGLE_CLIENT_ID ||
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  // Origin / base app URL (prioritizes NEXT_PUBLIC_APP_URL so redirect_uri exactly matches Google Cloud Console configuration)
+  // Determine origin: use the active request origin in development so localhost works seamlessly,
+  // or NEXT_PUBLIC_APP_URL in production.
   const origin =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
-    url.origin ||
-    "http://localhost:3000";
+    process.env.NODE_ENV === "development"
+      ? url.origin
+      : process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || url.origin || "http://localhost:3000";
 
   const redirectUri = `${origin}/api/auth/google/callback`;
 

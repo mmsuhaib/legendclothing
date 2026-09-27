@@ -37,7 +37,7 @@ const publicDest = path.join(standaloneDir, "public");
 console.log("- Copying public folder...");
 copyDirRecursive(publicSrc, publicDest);
 
-// 3. Copy prisma directory (schema + SQLite database)
+// 3. Copy prisma directory (schema + migrations/seeds)
 const prismaSrc = path.join(rootDir, "prisma");
 const prismaDest = path.join(standaloneDir, "prisma");
 console.log("- Copying prisma database...");

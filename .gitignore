@@ -46,3 +46,8 @@ public/sw.js.map
 
 # archives
 *.zip
+
+# sqlite local databases
+*.db
+*.db-journal
+
